@@ -1,0 +1,2 @@
+from django.conf.urls import patterns, url
+from all_agents import views

@@ -1,0 +1,5 @@
+Django
+ua-parser
+user-agents
+django-user-agents
+python-memcached

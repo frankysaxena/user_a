@@ -9,5 +9,7 @@ urlpatterns = patterns('',
     url(r'^browser_info/?', include('browser_info.urls')),
     url(r'^$', 'user_a.views.my_view', name='my_view'),
     url(r'^all_agents/?', include('all_agents.urls')),
+    url(r'^$', 'user_a.views.get_browser_language', name='get_browser_language'),
+    url(r'^browser_lang/?', include('browser_lang.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )

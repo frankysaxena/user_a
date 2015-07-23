@@ -1,3 +1,5 @@
+
+
 """
 Django settings for user_a project.
 
@@ -10,9 +12,18 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from mongoengine import connect,ConnectionError
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_PATH = os.path.join(BASE_DIR,os.pardir)
+PROJECT_PATH = os.path.abspath(PROJECT_PATH)
+DBNAME =  os.environ.get("DBNAME") 
+MONGO_DATABASE_NAME = DBNAME
+print DBNAME
+MONGO_PORT_27017_TCP_ADDR = os.environ.get("MONGO_PORT_27017_TCP_ADDR","127.0.0.1")
+MONGO_PORT_27017_TCP_PORT = int(os.environ.get("MONGO_PORT_27017_TCP_PORT","27017"))
+DB = connect(DBNAME,host=MONGO_PORT_27017_TCP_ADDR, port=MONGO_PORT_27017_TCP_PORT)
 
-
+DOMAIN = os.environ.get("DOMAIN")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -37,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_user_agents',
+    'mongoengine.django.mongo_auth',
 )
 
 # Cache backend is optional, but recommended to speed up user agent parsing
@@ -61,6 +73,14 @@ MIDDLEWARE_CLASSES = (
     'django_user_agents.middleware.UserAgentMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+MONGOENGINE_USER_DOCUMENT = 'web.user.participant.models.Participant'
+SOCIAL_AUTH_USER_MODEL = 'web.user.participant.models.Participant'
+AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+AUTHENTICATION_BACKENDS = (
+    'social.backends.facebook.FacebookOAuth2',
+    # 'mongoengine.django.auth.MongoEngineBackend',
+    'web.auth_backends.NonSocialUserAuth',
+)
 
 ROOT_URLCONF = 'user_a.urls'
 
@@ -72,10 +92,16 @@ WSGI_APPLICATION = 'user_a.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django_mongodb_engine',
-        'NAME': 'browser_database.db',
+        'ENGINE': 'django.db.backends.dummy',
     }
 }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+SESSION_ENGINE = 'mongoengine.django.sessions'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
